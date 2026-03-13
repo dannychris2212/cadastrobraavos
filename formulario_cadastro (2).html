@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Braavos — Cadastro de Novo Cliente</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#c9a84c;--gold2:#e8c97a;--dark:#0a0a0f;--panel:rgba(255,255,255,.03);
+  --border:rgba(201,168,76,.18);--border2:rgba(255,255,255,.07);
+  --txt:#f0ede6;--muted:rgba(240,237,230,.45);--ok:#4fc87a;--err:#f56565;
+}
+html,body{min-height:100%;background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;line-height:1.6}
+
+/* BG */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg::before{content:'';position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,.10) 0%,transparent 65%);
+  top:-300px;right:-200px}
+.bg::after{content:'';position:absolute;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(14,165,233,.06) 0%,transparent 65%);
+  bottom:-200px;left:-100px}
+.grid-bg{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(201,168,76,.03) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(201,168,76,.03) 1px,transparent 1px);
+  background-size:48px 48px}
+
+/* LAYOUT */
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:48px 24px 80px}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:56px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:.06em;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-sub{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-top:2px;margin-bottom:20px}
+.header-title{font-size:28px;font-weight:600;color:var(--txt);margin-bottom:8px}
+.header-desc{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto}
+
+/* SEÇÃO */
+.section{margin-bottom:40px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;
+  padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-num{width:32px;height:32px;border-radius:50%;background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--dark);flex-shrink:0}
+.section-label{font-size:13px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold)}
+
+/* CARD */
+.card{background:var(--panel);border:1px solid var(--border2);border-radius:16px;padding:28px}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}}
+
+/* CAMPOS */
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.fg:last-child{margin-bottom:0}
+label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+label span{color:var(--err);margin-left:2px}
+input,select,textarea{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:12px 14px;font-size:14px;color:var(--txt);
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,background .2s;width:100%}
+input::placeholder,textarea::placeholder{color:rgba(240,237,230,.25)}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--gold);background:rgba(201,168,76,.06)}
+select option{background:#1a1a2e;color:var(--txt)}
+textarea{resize:vertical;min-height:80px}
+
+/* VENDEDOR BLOCK */
+.vendedor-block{background:rgba(255,255,255,.02);border:1px solid var(--border2);
+  border-radius:12px;padding:20px;margin-bottom:14px;position:relative}
+.vendedor-block:last-child{margin-bottom:0}
+.vendedor-num{position:absolute;top:16px;right:16px;
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);
+  background:rgba(255,255,255,.06);border-radius:6px;padding:3px 8px}
+.vendedor-remove{position:absolute;top:14px;right:100px;
+  background:none;border:none;cursor:pointer;color:var(--err);font-size:18px;
+  line-height:1;padding:2px 6px;border-radius:6px;transition:background .2s}
+.vendedor-remove:hover{background:rgba(245,101,101,.1)}
+
+/* PRODUTO BLOCK */
+.produto-block{background:rgba(255,255,255,.02);border:1px solid var(--border2);
+  border-radius:12px;padding:20px;margin-bottom:14px;position:relative}
+.produto-block:last-child{margin-bottom:0}
+
+/* BTN ADICIONAR */
+.btn-add{display:flex;align-items:center;gap:8px;padding:10px 18px;
+  border:1px dashed rgba(201,168,76,.4);border-radius:10px;
+  background:rgba(201,168,76,.05);color:var(--gold);font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;width:100%;
+  justify-content:center;margin-top:4px}
+.btn-add:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+
+/* SUBMIT */
+.submit-area{margin-top:48px;text-align:center}
+.btn-submit{height:56px;padding:0 48px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--dark);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.02em}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(201,168,76,.35)}
+.btn-submit:active{transform:translateY(0)}
+.submit-sub{font-size:12px;color:var(--muted);margin-top:10px}
+
+/* SUCESSO */
+.success{display:none;text-align:center;padding:60px 24px}
+.success-ic{font-size:64px;margin-bottom:20px}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--ok);margin-bottom:10px}
+.success-sub{font-size:16px;color:var(--muted);max-width:400px;margin:0 auto}
+
+/* NOTA */
+.nota{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);
+  border-radius:10px;padding:14px 16px;margin-bottom:20px}
+.nota strong{color:var(--gold)}
+
+/* RADIO CUSTOM */
+.radio-group{display:flex;gap:10px;flex-wrap:wrap}
+.radio-opt{position:relative}
+.radio-opt input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.radio-opt label{display:flex;align-items:center;gap:8px;padding:9px 16px;
+  border:1px solid rgba(255,255,255,.1);border-radius:8px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--muted);text-transform:none;
+  letter-spacing:0;transition:all .2s;background:rgba(255,255,255,.03)}
+.radio-opt input[type=radio]:checked + label{
+  border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.1)}
+
+/* PROGRESS */
+.progress{display:flex;gap:6px;justify-content:center;margin-bottom:40px}
+.prog-dot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.12);transition:all .3s}
+.prog-dot.done{background:var(--ok);width:20px}
+.prog-dot.active{background:var(--gold);width:24px}
+</style>
+</head>
+<body>
+<div class="bg"><div class="grid-bg"></div></div>
+
+<div class="wrap" id="form-wrap">
+  <div class="header">
+    <div class="logo">BRAAVOS</div>
+    <div class="header-sub">Sales Intelligence</div>
+    <div class="header-title">Ficha de Cadastro</div>
+    <div class="header-desc">Preencha as informações abaixo para ativarmos sua conta. Leva menos de 5 minutos.</div>
+  </div>
+
+  <div class="nota">
+    <strong>⬡ Como funciona:</strong> Após preencher este formulário, nossa equipe configura sua plataforma em até 1 dia útil e envia o link de acesso para o responsável.
+  </div>
+
+  <form id="main-form" onsubmit="enviar(event)" novalidate>
+
+    <!-- ── SEÇÃO 1: EMPRESA ─────────────────────────────────── -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-num">1</div>
+        <div class="section-label">Dados da Empresa</div>
+      </div>
+      <div class="card">
+        <div class="g2">
+          <div class="fg">
+            <label>Razão Social <span>*</span></label>
+            <input type="text" name="razao_social" placeholder="Ex: Distribuidora Exemplo Ltda." required/>
+          </div>
+          <div class="fg">
+            <label>Nome Fantasia</label>
+            <input type="text" name="nome_fantasia" placeholder="Ex: Posto Central"/>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>CNPJ <span>*</span></label>
+            <input type="text" name="cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="mascaraCNPJ(this)" required/>
+          </div>
+          <div class="fg">
+            <label>Inscrição Estadual</label>
+            <input type="text" name="ie" placeholder="Opcional"/>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Endereço Completo <span>*</span></label>
+          <input type="text" name="endereco" placeholder="Rua, número, bairro, cidade — UF" required/>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>E-mail Financeiro <span>*</span></label>
+            <input type="email" name="email_financeiro" placeholder="financeiro@empresa.com.br" required/>
+          </div>
+          <div class="fg">
+            <label>Telefone Comercial</label>
+            <input type="text" name="telefone" placeholder="(11) 3000-0000" maxlength="15" oninput="mascaraTel(this)"/>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Plano Contratado <span>*</span></label>
+          <div class="radio-group">
+            <div class="radio-opt">
+              <input type="radio" name="plano" id="pl-starter" value="Starter" required/>
+              <label for="pl-starter">◈ Starter <small style="opacity:.6">(até 3 vendedores)</small></label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="plano" id="pl-growth" value="Growth"/>
+              <label for="pl-growth">◎ Growth <small style="opacity:.6">(até 10 vendedores)</small></label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="plano" id="pl-enterprise" value="Enterprise"/>
+              <label for="pl-enterprise">⬡ Enterprise <small style="opacity:.6">(ilimitado)</small></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 2: RESPONSÁVEL ────────────────────────────── -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-num">2</div>
+        <div class="section-label">Responsável / Gerente</div>
+      </div>
+      <div class="card">
+        <div class="nota" style="margin-bottom:20px">
+          <strong>Gerente:</strong> Esta pessoa terá acesso total ao painel, incluindo relatórios de equipe e configurações.
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>Nome Completo <span>*</span></label>
+            <input type="text" name="gerente_nome" placeholder="Nome do gerente / responsável" required/>
+          </div>
+          <div class="fg">
+            <label>Cargo</label>
+            <input type="text" name="gerente_cargo" placeholder="Ex: Gerente Comercial, Diretor"/>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>E-mail (login da plataforma) <span>*</span></label>
+            <input type="email" name="gerente_email" placeholder="gerente@empresa.com.br" required/>
+          </div>
+          <div class="fg">
+            <label>WhatsApp pessoal <span>*</span></label>
+            <input type="text" name="gerente_wpp" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)" required/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 3: VENDEDORES ─────────────────────────────── -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-num">3</div>
+        <div class="section-label">Equipe de Vendedores</div>
+      </div>
+      <div class="card">
+        <div class="nota" style="margin-bottom:20px">
+          <strong>Importante:</strong> Cada vendedor precisa de um número de WhatsApp próprio. Este número será conectado à plataforma e receberá os alertas.
+        </div>
+        <div id="vendedores-list">
+          <!-- Vendedor 1 sempre fixo -->
+          <div class="vendedor-block" id="vend-1">
+            <div class="vendedor-num">Vendedor 1</div>
+            <div class="g2">
+              <div class="fg">
+                <label>Nome <span>*</span></label>
+                <input type="text" name="vend_nome_1" placeholder="Nome do vendedor" required/>
+              </div>
+              <div class="fg">
+                <label>E-mail (login) <span>*</span></label>
+                <input type="email" name="vend_email_1" placeholder="vendedor@empresa.com.br" required/>
+              </div>
+            </div>
+            <div class="g2">
+              <div class="fg">
+                <label>WhatsApp próprio <span>*</span></label>
+                <input type="text" name="vend_wpp_1" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)" required/>
+              </div>
+              <div class="fg">
+                <label>Região / Território</label>
+                <input type="text" name="vend_regiao_1" placeholder="Ex: Zona Norte, Interior"/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addVendedor()">
+          + Adicionar outro vendedor
+        </button>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 4: PRODUTOS ───────────────────────────────── -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-num">4</div>
+        <div class="section-label">Produtos e Preços</div>
+      </div>
+      <div class="card">
+        <div class="nota" style="margin-bottom:20px">
+          <strong>Para que serve:</strong> Esses dados alimentam as tabelas de preço da plataforma e os alertas de recompra. Os preços podem ser atualizados a qualquer momento.
+        </div>
+        <div id="produtos-list">
+          <div class="produto-block" id="prod-1">
+            <div class="vendedor-num">Produto 1</div>
+            <div class="g3">
+              <div class="fg">
+                <label>Nome do Produto <span>*</span></label>
+                <input type="text" name="prod_nome_1" placeholder="Ex: Diesel S10" required/>
+              </div>
+              <div class="fg">
+                <label>Unidade</label>
+                <select name="prod_unidade_1">
+                  <option value="litro">Litro</option>
+                  <option value="m3">Metro cúbico</option>
+                  <option value="kg">Quilograma</option>
+                  <option value="caixa">Caixa</option>
+                  <option value="unidade">Unidade</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Preço de Referência (R$)</label>
+                <input type="text" name="prod_preco_1" placeholder="0,00" oninput="mascaraPreco(this)"/>
+              </div>
+            </div>
+            <div class="fg">
+              <label>Categoria</label>
+              <div class="radio-group">
+                <div class="radio-opt">
+                  <input type="radio" name="prod_cat_1" id="cat1-comb" value="combustivel"/>
+                  <label for="cat1-comb">⛽ Combustível</label>
+                </div>
+                <div class="radio-opt">
+                  <input type="radio" name="prod_cat_1" id="cat1-lub" value="lubrificante"/>
+                  <label for="cat1-lub">🔧 Lubrificante</label>
+                </div>
+                <div class="radio-opt">
+                  <input type="radio" name="prod_cat_1" id="cat1-adi" value="aditivo"/>
+                  <label for="cat1-adi">🧪 Aditivo</label>
+                </div>
+                <div class="radio-opt">
+                  <input type="radio" name="prod_cat_1" id="cat1-out" value="outro"/>
+                  <label for="cat1-out">📦 Outro</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addProduto()">
+          + Adicionar outro produto
+        </button>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 6: CONTEXTO ──────────────────────────────── -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-num">5</div>
+        <div class="section-label">Contexto da Operação</div>
+      </div>
+      <div class="card">
+        <div class="fg">
+          <label>Quantos clientes ativos vocês têm hoje?</label>
+          <select name="qtd_clientes">
+            <option value="" disabled selected>Selecione uma faixa</option>
+            <option value="1-50">Até 50 clientes</option>
+            <option value="51-150">51 a 150 clientes</option>
+            <option value="151-500">151 a 500 clientes</option>
+            <option value="500+">Mais de 500 clientes</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Vocês têm uma base de dados de clientes para importar?</label>
+          <div class="radio-group">
+            <div class="radio-opt">
+              <input type="radio" name="tem_base" id="base-sim" value="sim"/>
+              <label for="base-sim">✅ Sim, temos planilha/sistema</label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="tem_base" id="base-nao" value="nao"/>
+              <label for="base-nao">❌ Não, vamos cadastrar do zero</label>
+            </div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Alguma informação adicional que devemos saber?</label>
+          <textarea name="obs_geral" placeholder="Ex: regiões de atuação, produtos específicos, horário de atendimento preferencial..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-area">
+      <button type="submit" class="btn-submit">⬡ Enviar Cadastro</button>
+      <div class="submit-sub">Suas informações são tratadas com sigilo conforme nossa política de privacidade e LGPD.</div>
+    </div>
+
+  </form>
+</div>
+
+<!-- SUCESSO -->
+<div id="sucesso" class="wrap success" style="display:none">
+  <div class="success-ic">🚀</div>
+  <div class="success-title">Cadastro Enviado!</div>
+  <div class="success-sub">Recebemos suas informações. Nossa equipe vai configurar sua plataforma e entrar em contato em até <strong style="color:var(--txt)">1 dia útil</strong>.</div>
+  <div style="margin-top:32px;font-size:14px;color:var(--muted)">Qualquer dúvida, fale com a gente pelo WhatsApp.</div>
+</div>
+
+<script>
+// ── CONFIG SUPABASE ──────────────────────────────────────────────
+const SUPA_URL  = 'https://wufkytnlhiscyzatumvc.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1Zmt5dG5saGlzY3l6YXR1bXZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Nzc5OTcsImV4cCI6MjA4NjI1Mzk5N30.2IdxHQWDPjk4_pW2aNyIob2khIrW5ajYHXKYIIBu2xE'; // substitua pela anon key pública
+
+let vendCount = 1;
+let prodCount = 1;
+
+function addVendedor() {
+  vendCount++;
+  const n = vendCount;
+  const div = document.createElement('div');
+  div.className = 'vendedor-block';
+  div.id = `vend-${n}`;
+  div.innerHTML = `
+    <div class="vendedor-num">Vendedor ${n}</div>
+    <button type="button" class="vendedor-remove" onclick="remover('vend-${n}')" title="Remover">✕</button>
+    <div class="g2">
+      <div class="fg">
+        <label>Nome <span style="color:var(--err)">*</span></label>
+        <input type="text" name="vend_nome_${n}" placeholder="Nome do vendedor"/>
+      </div>
+      <div class="fg">
+        <label>E-mail (login)</label>
+        <input type="email" name="vend_email_${n}" placeholder="vendedor@empresa.com.br"/>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="fg">
+        <label>WhatsApp próprio <span style="color:var(--err)">*</span></label>
+        <input type="text" name="vend_wpp_${n}" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)"/>
+      </div>
+      <div class="fg">
+        <label>Região / Território</label>
+        <input type="text" name="vend_regiao_${n}" placeholder="Ex: Zona Norte, Interior"/>
+      </div>
+    </div>`;
+  document.getElementById('vendedores-list').appendChild(div);
+}
+
+function addProduto() {
+  prodCount++;
+  const n = prodCount;
+  const div = document.createElement('div');
+  div.className = 'produto-block';
+  div.id = `prod-${n}`;
+  div.innerHTML = `
+    <div class="vendedor-num">Produto ${n}</div>
+    <button type="button" class="vendedor-remove" onclick="remover('prod-${n}')" title="Remover">✕</button>
+    <div class="g3">
+      <div class="fg">
+        <label>Nome do Produto</label>
+        <input type="text" name="prod_nome_${n}" placeholder="Ex: Gasolina Comum"/>
+      </div>
+      <div class="fg">
+        <label>Unidade</label>
+        <select name="prod_unidade_${n}">
+          <option value="litro">Litro</option>
+          <option value="m3">Metro cúbico</option>
+          <option value="kg">Quilograma</option>
+          <option value="caixa">Caixa</option>
+          <option value="unidade">Unidade</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Preço de Referência (R$)</label>
+        <input type="text" name="prod_preco_${n}" placeholder="0,00" oninput="mascaraPreco(this)"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Categoria</label>
+      <div class="radio-group">
+        <div class="radio-opt"><input type="radio" name="prod_cat_${n}" id="cat${n}-comb" value="combustivel"/><label for="cat${n}-comb">⛽ Combustível</label></div>
+        <div class="radio-opt"><input type="radio" name="prod_cat_${n}" id="cat${n}-lub" value="lubrificante"/><label for="cat${n}-lub">🔧 Lubrificante</label></div>
+        <div class="radio-opt"><input type="radio" name="prod_cat_${n}" id="cat${n}-adi" value="aditivo"/><label for="cat${n}-adi">🧪 Aditivo</label></div>
+        <div class="radio-opt"><input type="radio" name="prod_cat_${n}" id="cat${n}-out" value="outro"/><label for="cat${n}-out">📦 Outro</label></div>
+      </div>
+    </div>`;
+  document.getElementById('produtos-list').appendChild(div);
+}
+
+function remover(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// Máscaras
+function mascaraCNPJ(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,14);
+  v = v.replace(/^(\d{2})(\d)/,'$1.$2');
+  v = v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');
+  v = v.replace(/\.(\d{3})(\d)/,'.$1/$2');
+  v = v.replace(/(\d{4})(\d)/,'$1-$2');
+  el.value = v;
+}
+
+function mascaraTel(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if (v.length <= 10) v = v.replace(/^(\d{2})(\d{4})(\d)/,'($1) $2-$3');
+  else v = v.replace(/^(\d{2})(\d{5})(\d)/,'($1) $2-$3');
+  el.value = v;
+}
+
+function mascaraWpp(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if (v.length <= 10) v = v.replace(/^(\d{2})(\d{4})(\d)/,'($1) $2-$3');
+  else v = v.replace(/^(\d{2})(\d{5})(\d)/,'($1) $2-$3');
+  el.value = v;
+}
+
+function mascaraPreco(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (!v) { el.value = ''; return; }
+  v = (parseInt(v) / 100).toFixed(2).replace('.',',');
+  el.value = v;
+}
+
+// Submit — coleta tudo em JSON e exibe confirmação
+async function enviar(e) {
+  e.preventDefault();
+  const form = document.getElementById('main-form');
+  const data = new FormData(form);
+
+  // ── Monta payload ─────────────────────────────────────
+  const empresa = {
+    razao_social:    data.get('razao_social'),
+    nome_fantasia:   data.get('nome_fantasia'),
+    cnpj:            data.get('cnpj'),
+    ie:              data.get('ie'),
+    endereco:        data.get('endereco'),
+    email_financeiro:data.get('email_financeiro'),
+    telefone:        data.get('telefone'),
+    plano:           data.get('plano'),
+  };
+
+  const gerente = {
+    nome:     data.get('gerente_nome'),
+    cargo:    data.get('gerente_cargo'),
+    email:    data.get('gerente_email'),
+    whatsapp: data.get('gerente_wpp'),
+  };
+
+  const vendedores = [];
+  for (let i = 1; i <= vendCount; i++) {
+    const nome = data.get(`vend_nome_${i}`);
+    if (nome) vendedores.push({
+      nome,
+      email:    data.get(`vend_email_${i}`),
+      whatsapp: data.get(`vend_wpp_${i}`),
+      regiao:   data.get(`vend_regiao_${i}`),
+    });
+  }
+
+  const produtos = [];
+  for (let i = 1; i <= prodCount; i++) {
+    const nome = data.get(`prod_nome_${i}`);
+    if (nome) produtos.push({
+      nome,
+      unidade:          data.get(`prod_unidade_${i}`),
+      preco_referencia: data.get(`prod_preco_${i}`),
+      categoria:        data.get(`prod_cat_${i}`),
+    });
+  }
+
+  const contexto = {
+    qtd_clientes: data.get('qtd_clientes'),
+    tem_base:     data.get('tem_base'),
+    obs:          data.get('obs_geral'),
+  };
+
+  const payload = { empresa, gerente, vendedores, produtos, contexto };
+
+  // ── Botão de loading ──────────────────────────────────
+  const btn = document.querySelector('.btn-submit');
+  const btnTxt = btn.textContent;
+  btn.textContent = '⏳ Enviando...';
+  btn.disabled = true;
+
+  // ── POST no Supabase ──────────────────────────────────
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/cadastros_pendentes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_ANON,
+        'Authorization': `Bearer ${SUPA_ANON}`,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({
+        dados: payload,
+        razao_social:     empresa.razao_social,
+        cnpj:             empresa.cnpj,
+        plano:            empresa.plano,
+        gerente_nome:     gerente.nome,
+        gerente_email:    gerente.email,
+        gerente_whatsapp: gerente.whatsapp,
+        qtd_vendedores:   vendedores.length,
+        status:           'pendente',
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Sucesso!
+    document.getElementById('form-wrap').style.display = 'none';
+    document.getElementById('sucesso').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } catch (err) {
+    console.error('Erro ao enviar:', err);
+    btn.textContent = btnTxt;
+    btn.disabled = false;
+    // Mostra erro inline
+    let errDiv = document.getElementById('form-error');
+    if (!errDiv) {
+      errDiv = document.createElement('div');
+      errDiv.id = 'form-error';
+      errDiv.style.cssText = 'background:rgba(245,101,101,.1);border:1px solid rgba(245,101,101,.4);border-radius:10px;padding:14px 16px;margin-top:16px;font-size:13px;color:#f56565;text-align:center';
+      document.querySelector('.submit-area').appendChild(errDiv);
+    }
+    errDiv.textContent = '⚠️ Erro ao enviar. Tente novamente ou entre em contato pelo WhatsApp.';
+  }
+}
+</script>
+</body>
+</html>
