@@ -196,6 +196,21 @@ textarea{resize:vertical;min-height:80px}
             <input type="text" name="telefone" placeholder="(11) 3000-0000" maxlength="15" oninput="mascaraTel(this)"/>
           </div>
         </div>
+        <div class="g2">
+          <div class="fg">
+            <label>CPF ou CNPJ do Responsável Financeiro <span>*</span></label>
+            <input type="text" name="cpf_cnpj_financeiro" placeholder="000.000.000-00 ou 00.000.000/0000-00" required/>
+          </div>
+          <div class="fg">
+            <label>Forma de Pagamento Preferida <span>*</span></label>
+            <select name="forma_pagamento" required>
+              <option value="">Selecione...</option>
+              <option value="pix">PIX</option>
+              <option value="boleto">Boleto Bancário</option>
+              <option value="cartao">Cartão de Crédito</option>
+            </select>
+          </div>
+        </div>
         <div class="fg">
           <label>Plano Contratado <span>*</span></label>
           <div class="radio-group">
@@ -246,6 +261,17 @@ textarea{resize:vertical;min-height:80px}
             <input type="text" name="gerente_wpp" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)" required/>
           </div>
         </div>
+        <div class="g2">
+          <div class="fg">
+            <label>WhatsApp da Instância Braavos <span>*</span></label>
+            <input type="text" name="gerente_wpp_instancia" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)" required/>
+            <small style="color:var(--muted);font-size:11px;margin-top:4px;display:block">Número que será conectado à plataforma para receber alertas e automações.</small>
+          </div>
+          <div class="fg">
+            <label>Telefone Comercial</label>
+            <input type="text" name="gerente_tel" placeholder="(11) 3000-0000" maxlength="15" oninput="mascaraTel(this)"/>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -275,13 +301,17 @@ textarea{resize:vertical;min-height:80px}
             </div>
             <div class="g2">
               <div class="fg">
-                <label>WhatsApp próprio <span>*</span></label>
+                <label>WhatsApp pessoal <span>*</span></label>
                 <input type="text" name="vend_wpp_1" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)" required/>
               </div>
               <div class="fg">
-                <label>Região / Território</label>
-                <input type="text" name="vend_regiao_1" placeholder="Ex: Zona Norte, Interior"/>
+                <label>WhatsApp da Instância Braavos <span>*</span></label>
+                <input type="text" name="vend_wpp_instancia_1" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)" required/>
               </div>
+            </div>
+            <div class="fg">
+              <label>Região / Território</label>
+              <input type="text" name="vend_regiao_1" placeholder="Ex: Zona Norte, Interior"/>
             </div>
           </div>
         </div>
@@ -384,6 +414,45 @@ textarea{resize:vertical;min-height:80px}
           </div>
         </div>
         <div class="fg">
+          <label>Sistema de registro de pedidos atual</label>
+          <div class="radio-group">
+            <div class="radio-opt">
+              <input type="radio" name="sistema_pedidos" id="sis-planilha" value="planilha"/>
+              <label for="sis-planilha">📊 Planilha própria (Excel / Google Sheets)</label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="sistema_pedidos" id="sis-erp" value="erp"/>
+              <label for="sis-erp">🖥️ ERP (Totvs, Sankhya, Omie, outro)</label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="sistema_pedidos" id="sis-manual" value="manual"/>
+              <label for="sis-manual">📝 Não uso sistema — papel / WhatsApp</label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="sistema_pedidos" id="sis-outro" value="outro"/>
+              <label for="sis-outro">🔧 Outro</label>
+            </div>
+          </div>
+          <input type="text" name="sistema_pedidos_outro" placeholder="Se outro, descreva qual sistema..." style="margin-top:8px"/>
+        </div>
+        <div class="fg">
+          <label>Como prefere exportar os pedidos do Braavos?</label>
+          <div class="radio-group">
+            <div class="radio-opt">
+              <input type="radio" name="export_mode" id="exp-csv" value="csv"/>
+              <label for="exp-csv">⬇ CSV — baixo manualmente quando precisar</label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="export_mode" id="exp-email" value="email"/>
+              <label for="exp-email">✉ E-mail automático ao fechar pedido</label>
+            </div>
+            <div class="radio-opt">
+              <input type="radio" name="export_mode" id="exp-ambos" value="ambos"/>
+              <label for="exp-ambos">◈ Ambos</label>
+            </div>
+          </div>
+        </div>
+        <div class="fg">
           <label>Alguma informação adicional que devemos saber?</label>
           <textarea name="obs_geral" placeholder="Ex: regiões de atuação, produtos específicos, horário de atendimento preferencial..."></textarea>
         </div>
@@ -436,13 +505,17 @@ function addVendedor() {
     </div>
     <div class="g2">
       <div class="fg">
-        <label>WhatsApp próprio <span style="color:var(--err)">*</span></label>
+        <label>WhatsApp pessoal <span style="color:var(--err)">*</span></label>
         <input type="text" name="vend_wpp_${n}" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)"/>
       </div>
       <div class="fg">
-        <label>Região / Território</label>
-        <input type="text" name="vend_regiao_${n}" placeholder="Ex: Zona Norte, Interior"/>
+        <label>WhatsApp da Instância Braavos <span style="color:var(--err)">*</span></label>
+        <input type="text" name="vend_wpp_instancia_${n}" placeholder="(11) 99999-0000" maxlength="16" oninput="mascaraWpp(this)"/>
       </div>
+    </div>
+    <div class="fg">
+      <label>Região / Território</label>
+      <input type="text" name="vend_regiao_${n}" placeholder="Ex: Zona Norte, Interior"/>
     </div>`;
   document.getElementById('vendedores-list').appendChild(div);
 }
